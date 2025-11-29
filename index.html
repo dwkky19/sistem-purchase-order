@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Purchase Order Perusahaan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --gray: #95a5a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo i {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .login-logo h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .login-form input:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        /* Main App Styles */
+        .app-container {
+            display: none;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info span {
+            margin-right: 15px;
+        }
+
+        nav {
+            background: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        nav ul li a.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        nav ul li a:hover:not(.active) {
+            background: #f8f9fa;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+
+        .form-control:read-only {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        .form-control:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Database Styles */
+        .database-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 1rem;
+        }
+
+        .search-box button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray);
+        }
+
+        /* Alert Styles */
+        .alert {
+            position: fixed;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 30px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 300px;
+            max-width: 500px;
+        }
+
+        .alert.show {
+            opacity: 1;
+        }
+
+        .alert-success {
+            background: var(--success);
+        }
+
+        .alert-warning {
+            background: var(--warning);
+        }
+
+        .alert-danger {
+            background: var(--danger);
+        }
+
+        .alert-info {
+            background: var(--secondary);
+        }
+
+        /* Step Form Styles */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 600;
+            border: 2px solid #ddd;
+        }
+
+        .step.active .step-number {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .step-line {
+            width: 80px;
+            height: 2px;
+            background: #ddd;
+            margin: 0 15px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        /* Item List Styles */
+        .item-list {
+            margin-bottom: 20px;
+        }
+
+        .item-card {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .remove-item {
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .add-item-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Status Badge Styles */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-draft {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .status-release {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-canceled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 15px 25px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Status Actions */
+        .status-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .status-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .status-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-btn.release {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-btn.complete {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-btn.cancel {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Date Info */
+        .date-info {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .date-info.warning {
+            color: var(--warning);
+            font-weight: 500;
+        }
+
+        /* Validation Styles */
+        .validation-error {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-control.error {
+            border-color: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .step-line {
+                width: 40px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-info {
+                margin-top: 15px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+            }
+            
+            nav ul li {
+                margin: 5px;
+            }
+            
+            .status-actions {
+                flex-direction: column;
+            }
+            
+            .alert {
+                min-width: 250px;
+                max-width: 90%;
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h1>Sistem Purchase Order</h1>
+            </div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="appPage" class="app-container">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Sistem Purchase Order</span>
+                    </div>
+                    <div class="user-info">
+                        <span id="loggedInUser">Admin</span>
+                        <button id="logoutBtn" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav>
+            <div class="container">
+                <ul>
+                    <li><a href="#" id="navInput" class="nav-link active">Input PO</a></li>
+                    <li><a href="#" id="navDatabase" class="nav-link">Database PO</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            <!-- Input PO Section -->
+            <div id="inputSection" class="form-container">
+                <h2 class="section-title">Input Purchase Order</h2>
+                
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Informasi PO</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Detail Barang</div>
+                    </div>
+                </div>
+                
+                <form id="poForm">
+                    <!-- Step 1: Informasi PO -->
+                    <div class="step-content active" data-step="1">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="poNumber">Nomor PO</label>
+                                <input type="text" id="poNumber" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="poDate">Tanggal PO</label>
+                                <input type="date" id="poDate" class="form-control" required>
+                                <div class="date-info warning" id="dateInfo">Tanggal PO harus minimal 7 hari ke depan dari hari ini</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="department">Departemen</label>
+                            <select id="department" class="form-control" required>
+                                <option value="">Pilih Departemen</option>
+                                <option value="IT">IT</option>
+                                <option value="HR">HR</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Operations">Operations</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-next" data-next="2">Selanjutnya</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Detail Barang -->
+                    <div class="step-content" data-step="2">
+                        <div class="item-list" id="itemList">
+                            <!-- Items will be added here dynamically -->
+                        </div>
+                        
+                        <button type="button" class="add-item-btn" id="addItemBtn">
+                            <i class="fas fa-plus"></i> Tambah Barang
+                        </button>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-prev" data-prev="1">Sebelumnya</button>
+                            <button type="submit" class="btn btn-success">Simpan PO</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Database Section -->
+            <div id="databaseSection" class="database-container" style="display: none;">
+                <h2 class="section-title">Database Purchase Order</h2>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Cari berdasarkan nomor PO, nama barang, atau departemen...">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="poTable">
+                        <thead>
+                            <tr>
+                                <th>No. PO</th>
+                                <th>Tanggal</th>
+                                <th>Departemen</th>
+                                <th>Jumlah Barang</th>
+                                <th>Total Harga</th>
+                                <th>Status</th>
+                                <th>Dibuat Oleh</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poTableBody">
+                            <!-- Data akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="emptyMessage" class="empty-message">
+                        Tidak ada data purchase order.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail PO -->
+    <div id="poDetailModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Detail Purchase Order</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nomor PO</label>
+                        <input type="text" id="detailPoNumber" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal PO</label>
+                        <input type="text" id="detailPoDate" class="form-control" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Departemen</label>
+                    <input type="text" id="detailDepartment" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div id="detailStatus" class="status-badge status-draft">Draft</div>
+                </div>
+                
+                <h4 style="margin: 20px 0 10px;">Daftar Barang</h4>
+                <div class="table-container">
+                    <table id="detailItemsTable">
+                        <thead>
+                            <tr>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Harga Satuan</th>
+                                <th>Total</th>
+                                <th>Deskripsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailItemsBody">
+                            <!-- Items akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Total Keseluruhan</label>
+                    <input type="text" id="detailTotal" class="form-control" readonly>
+                </div>
+                
+                <div class="status-actions">
+                    <button class="status-btn release" data-status="release">Release PO</button>
+                    <button class="status-btn complete" data-status="completed">Tandai Selesai</button>
+                    <button class="status-btn cancel" data-status="canceled">Batalkan PO</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="closeDetailModal">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <script>
+        // Security measures
+        (function() {
+            'use strict';
+            
+            // Prevent right-click
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            document.addEventListener('keydown', function(e) {
+                if (
+                    e.key === 'F12' ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                    (e.ctrlKey && e.key === 'U') ||
+                    (e.ctrlKey && e.key === 'u')
+                ) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Detect dev tools opening
+            let devtools = function() {};
+            devtools.toString = function() {
+                showAlert('Akses Developer Tools tidak diizinkan', 'danger');
+                return '';
+            };
+            console.log('%c', devtools);
+        })();
+
+        // Database Simulation
+        class PurchaseOrderDB {
+            constructor() {
+                this.loadFromStorage();
+                this.users = [
+                    { username: 'admin', password: 'admin123', name: 'Administrator' },
+                    { username: 'user', password: 'user123', name: 'Regular User' }
+                ];
+                this.currentUser = null;
+            }
+            
+            // Load data dari localStorage
+            loadFromStorage() {
+                try {
+                    const storedData = localStorage.getItem('purchaseOrders');
+                    
+                    if (storedData) {
+                        this.purchaseOrders = JSON.parse(storedData);
+                    } else {
+                        this.purchaseOrders = [];
+                    }
+                    
+                    // Initialize last PO number - FIXED: Calculate based on existing data
+                    this.calculateLastPONumber();
+                    
+                } catch (error) {
+                    console.error('Error loading from storage:', error);
+                    this.purchaseOrders = [];
+                    this.calculateLastPONumber();
+                }
+            }
+            
+            // Calculate last PO number based on existing data - FIXED
+            calculateLastPONumber() {
+                if (!this.purchaseOrders || this.purchaseOrders.length === 0) {
+                    this.lastPONumber = 0;
+                } else {
+                    // Extract PO numbers and find the highest
+                    const poNumbers = this.purchaseOrders
+                        .map(po => {
+                            const match = po.poNumber.match(/PO-(\d+)-/);
+                            return match ? parseInt(match[1]) : 0;
+                        })
+                        .filter(num => !isNaN(num));
+                    
+                    this.lastPONumber = poNumbers.length > 0 ? Math.max(...poNumbers) : 0;
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('lastPONumber', this.lastPONumber.toString());
+            }
+            
+            // Save data ke localStorage
+            saveToStorage() {
+                try {
+                    localStorage.setItem('purchaseOrders', JSON.stringify(this.purchaseOrders));
+                } catch (error) {
+                    console.error('Error saving to storage:', error);
+                }
+            }
+            
+            // User authentication
+            login(username, password) {
+                const user = this.users.find(u => u.username === username && u.password === password);
+                if (user) {
+                    this.currentUser = user;
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    return { success: true, user };
+                } else {
+                    return { success: false, message: 'Username atau password salah' };
+                }
+            }
+            
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('currentUser');
+                return { success: true };
+            }
+            
+            getCurrentUser() {
+                return this.currentUser || JSON.parse(localStorage.getItem('currentUser'));
+            }
+            
+            // Generate PO Number - FIXED: Always generate new number when needed
+            generatePONumber() {
+                this.lastPONumber++;
+                const year = new Date().getFullYear();
+                const poNumber = `PO-${this.lastPONumber.toString().padStart(4, '0')}-${year}`;
+                
+                // Save to localStorage
+                localStorage.setItem('lastPONumber', this.lastPONumber.toString());
+                
+                return poNumber;
+            }
+            
+            // Purchase Order operations
+            addPurchaseOrder(poData) {
+                try {
+                    const newPO = {
+                        id: Date.now(),
+                        poNumber: poData.poNumber,
+                        poDate: poData.poDate,
+                        department: poData.department,
+                        items: poData.items,
+                        status: 'draft',
+                        createdBy: this.getCurrentUser().name,
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    // Pastikan purchaseOrders adalah array
+                    if (!Array.isArray(this.purchaseOrders)) {
+                        this.purchaseOrders = [];
+                    }
+                    
+                    // Tambahkan PO baru
+                    this.purchaseOrders.push(newPO);
+                    
+                    // Simpan ke localStorage
+                    this.saveToStorage();
+                    
+                    return { success: true, data: newPO };
+                    
+                } catch (error) {
+                    console.error('Error saving PO:', error);
+                    return { success: false, message: 'Gagal menyimpan PO: ' + error.message };
+                }
+            }
+            
+            getAllPurchaseOrders() {
+                // Selalu ambil data terbaru dari localStorage
+                this.loadFromStorage();
+                return this.purchaseOrders || [];
+            }
+            
+            searchPurchaseOrders(query) {
+                const purchaseOrders = this.getAllPurchaseOrders();
+                if (!query) return purchaseOrders;
+                
+                const lowercaseQuery = query.toLowerCase();
+                return purchaseOrders.filter(po => {
+                    const matchesPO = po.poNumber.toLowerCase().includes(lowercaseQuery);
+                    const matchesDept = po.department.toLowerCase().includes(lowercaseQuery);
+                    const matchesItems = po.items && po.items.some(item => 
+                        item.name.toLowerCase().includes(lowercaseQuery)
+                    );
+                    
+                    return matchesPO || matchesDept || matchesItems;
+                });
+            }
+            
+            // Get PO by ID
+            getPOById(id) {
+                return this.getAllPurchaseOrders().find(po => po.id === id);
+            }
+            
+            // Update PO status
+            updatePOStatus(id, status) {
+                const poIndex = this.purchaseOrders.findIndex(po => po.id === id);
+                if (poIndex !== -1) {
+                    this.purchaseOrders[poIndex].status = status;
+                    this.saveToStorage();
+                    return { success: true, data: this.purchaseOrders[poIndex] };
+                }
+                return { success: false, message: 'PO tidak ditemukan' };
+            }
+        }
+
+        // Initialize database sebagai variabel global
+        let db;
+
+        // Global variable untuk menyimpan state PO sementara
+        let currentPONumber = null;
+
+        // Alert system
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            // Show alert
+            setTimeout(() => {
+                alert.classList.add('show');
+            }, 100);
+            
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alert.classList.remove('show');
+                
+                // Remove from DOM after transition
+                setTimeout(() => {
+                    alert.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // Function untuk mengatur nomor PO - FIXED
+        function setupPONumber() {
+            // Jika sudah ada currentPONumber, gunakan yang itu
+            // Jika belum, generate yang baru
+            if (!currentPONumber) {
+                currentPONumber = db.generatePONumber();
+            }
+            document.getElementById('poNumber').value = currentPONumber;
+        }
+
+        // Function untuk reset form dan generate PO baru - FIXED
+        function resetPOForm() {
+            // Generate PO number baru untuk transaksi berikutnya
+            currentPONumber = db.generatePONumber();
+            document.getElementById('poNumber').value = currentPONumber;
+            
+            // Reset form lainnya
+            document.getElementById('poForm').reset();
+            
+            // Set minimum date to 7 days from today
+            const today = new Date();
+            const timezoneOffset = today.getTimezoneOffset() * 60000;
+            const localDate = new Date(today - timezoneOffset);
+            const minDate = new Date(localDate);
+            minDate.setDate(minDate.getDate() + 7);
+            const minDateString = minDate.toISOString().split('T')[0];
+            
+            const poDateInput = document.getElementById('poDate');
+            poDateInput.value = minDateString;
+            poDateInput.min = minDateString;
+            
+            // Clear items and add one default
+            document.getElementById('itemList').innerHTML = '';
+            addItem();
+            
+            // Kembali ke step 1
+            goToStep(1);
+        }
+
+        // Form validation functions
+        function validateStep1() {
+            const poDate = document.getElementById('poDate');
+            const department = document.getElementById('department');
+            
+            // Get today's date in Indonesia timezone
+            const today = new Date();
+            const timezoneOffset = today.getTimezoneOffset() * 60000;
+            const localDate = new Date(today - timezoneOffset);
+            const todayString = localDate.toISOString().split('T')[0];
+            
+            // Calculate minimum date (7 days from today)
+            const minDate = new Date(localDate);
+            minDate.setDate(minDate.getDate() + 7);
+            const minDateString = minDate.toISOString().split('T')[0];
+            
+            // Check if date is at least 7 days from today
+            if (poDate.value < minDateString) {
+                showAlert('Tanggal PO harus minimal 7 hari ke depan dari hari ini', 'warning');
+                poDate.focus();
+                return false;
+            }
+            
+            if (!poDate.value) {
+                showAlert('Tanggal PO harus diisi', 'warning');
+                poDate.focus();
+                return false;
+            }
+            
+            if (!department.value) {
+                showAlert('Departemen harus dipilih', 'warning');
+                department.focus();
+                return false;
+            }
+            
+            return true;
+        }
+
+        function validateStep2() {
+            const items = document.querySelectorAll('.item-card');
+            
+            if (items.length === 0) {
+                showAlert('Minimal harus ada 1 barang dalam PO', 'warning');
+                return false;
+            }
+            
+            // Validate each item
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const name = item.querySelector('.item-name').value;
+                const quantity = item.querySelector('.item-quantity').value;
+                const price = item.querySelector('.item-price').value;
+                const description = item.querySelector('.item-description').value;
+                
+                if (!name) {
+                    showAlert(`Nama barang ke-${i+1} harus diisi`, 'warning');
+                    item.querySelector('.item-name').focus();
+                    return false;
+                }
+                
+                if (!quantity || quantity < 1) {
+                    showAlert(`Jumlah barang ke-${i+1} harus minimal 1`, 'warning');
+                    item.querySelector('.item-quantity').focus();
+                    return false;
+                }
+                
+                if (!price || price < 1000) {
+                    showAlert(`Harga barang ke-${i+1} harus minimal Rp 1.000`, 'warning');
+                    item.querySelector('.item-price').focus();
+                    return false;
+                }
+                
+                // Validasi deskripsi minimal 5 huruf
+                if (!description || description.trim().length < 5) {
+                    showAlert(`Deskripsi barang ke-${i+1} harus diisi minimal 5 huruf`, 'warning');
+                    item.querySelector('.item-description').focus();
+                    return false;
+                }
+                
+                // Validasi deskripsi tidak boleh angka - NEW
+                if (containsOnlyNumbers(description)) {
+                    showAlert(`Deskripsi barang ke-${i+1} tidak boleh hanya berisi angka`, 'warning');
+                    item.querySelector('.item-description').focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Helper function to check if string contains only numbers - NEW
+        function containsOnlyNumbers(str) {
+            return /^\d+$/.test(str.replace(/\s/g, ''));
+        }
+
+        // Step navigation
+        function goToStep(stepNumber) {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show target step
+            document.querySelector(`.step-content[data-step="${stepNumber}"]`).classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+                
+                const stepNum = parseInt(step.getAttribute('data-step'));
+                if (stepNum === stepNumber) {
+                    step.classList.add('active');
+                } else if (stepNum < stepNumber) {
+                    step.classList.add('completed');
+                }
+            });
+        }
+
+        // Item management
+        function addItem() {
+            const itemList = document.getElementById('itemList');
+            const itemCount = itemList.children.length + 1;
+            
+            const itemHTML = `
+                <div class="item-card">
+                    <div class="item-header">
+                        <div class="item-title">Barang #${itemCount}</div>
+                        <button type="button" class="remove-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama Barang</label>
+                            <input type="text" class="form-control item-name" required maxlength="100" placeholder="Masukkan nama barang">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Jumlah</label>
+                            <input type="number" class="form-control item-quantity" required min="1" max="10000" placeholder="Masukkan jumlah">
+                        </div>
+                        <div class="form-group">
+                            <label>Harga Satuan (Rp)</label>
+                            <input type="number" class="form-control item-price" required min="1000" step="1000" placeholder="Masukkan harga satuan">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi Barang <small>(minimal 5 huruf, tidak boleh hanya angka)</small></label>
+                        <textarea class="form-control item-description" rows="2" maxlength="500" placeholder="Masukkan deskripsi barang (minimal 5 huruf, tidak boleh hanya angka)" required></textarea>
+                        <div class="validation-error" id="descriptionError">Deskripsi tidak boleh hanya berisi angka</div>
+                    </div>
+                </div>
+            `;
+            
+            itemList.insertAdjacentHTML('beforeend', itemHTML);
+            
+            // Add event listener to remove button
+            const newItem = itemList.lastElementChild;
+            newItem.querySelector('.remove-item').addEventListener('click', function() {
+                if (itemList.children.length > 1) {
+                    newItem.remove();
+                    updateItemNumbers();
+                } else {
+                    showAlert('Minimal harus ada 1 barang dalam PO', 'warning');
+                }
+            });
+            
+            // Add validation for description field - NEW
+            const descriptionField = newItem.querySelector('.item-description');
+            const errorElement = newItem.querySelector('.validation-error');
+            
+            descriptionField.addEventListener('input', function() {
+                validateDescriptionField(this, errorElement);
+            });
+            
+            descriptionField.addEventListener('blur', function() {
+                validateDescriptionField(this, errorElement);
+            });
+        }
+
+        // Validate description field - NEW
+        function validateDescriptionField(field, errorElement) {
+            const value = field.value.trim();
+            
+            if (containsOnlyNumbers(value)) {
+                field.classList.add('error');
+                errorElement.style.display = 'block';
+                return false;
+            } else {
+                field.classList.remove('error');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        }
+
+        function updateItemNumbers() {
+            const items = document.querySelectorAll('.item-card');
+            items.forEach((item, index) => {
+                item.querySelector('.item-title').textContent = `Barang #${index + 1}`;
+            });
+        }
+
+        // Update database table
+        function updateDatabaseTable(poList = null) {
+            const tableBody = document.getElementById('poTableBody');
+            const emptyMessage = document.getElementById('emptyMessage');
+            
+            // Always get fresh data from database
+            const purchaseOrders = poList || db.getAllPurchaseOrders();
+            
+            if (!purchaseOrders || purchaseOrders.length === 0) {
+                tableBody.innerHTML = '';
+                emptyMessage.style.display = 'block';
+                return;
+            }
+            
+            emptyMessage.style.display = 'none';
+            
+            tableBody.innerHTML = purchaseOrders.map(po => {
+                const totalItems = po.items ? po.items.length : 0;
+                const totalPrice = po.items ? po.items.reduce((sum, item) => sum + (item.quantity * item.price), 0) : 0;
+                const statusClass = `status-${po.status}`;
+                const statusText = getStatusText(po.status);
+                
+                return `
+                    <tr>
+                        <td>${po.poNumber}</td>
+                        <td>${new Date(po.poDate).toLocaleDateString('id-ID')}</td>
+                        <td>${po.department}</td>
+                        <td>${totalItems} item</td>
+                        <td>Rp ${totalPrice.toLocaleString('id-ID')}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${po.createdBy}</td>
+                        <td>
+                            <button class="btn" data-action="view" data-id="${po.id}">
+                                <i class="fas fa-eye"></i> Lihat
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('[data-action="view"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const poId = parseInt(this.getAttribute('data-id'));
+                    showPODetail(poId);
+                });
+            });
+        }
+
+        // Get status text
+        function getStatusText(status) {
+            switch(status) {
+                case 'draft': return 'Draft';
+                case 'release': return 'Release';
+                case 'completed': return 'Selesai';
+                case 'canceled': return 'Dibatalkan';
+                default: return 'Tidak Diketahui';
+            }
+        }
+
+        // Show PO Detail Modal
+        function showPODetail(poId) {
+            const po = db.getPOById(poId);
+            if (!po) {
+                showAlert('Data PO tidak ditemukan', 'danger');
+                return;
+            }
+            
+            // Fill modal with PO data
+            document.getElementById('detailPoNumber').value = po.poNumber;
+            document.getElementById('detailPoDate').value = new Date(po.poDate).toLocaleDateString('id-ID');
+            document.getElementById('detailDepartment').value = po.department;
+            
+            // Update status badge
+            const statusBadge = document.getElementById('detailStatus');
+            statusBadge.className = `status-badge status-${po.status}`;
+            statusBadge.textContent = getStatusText(po.status);
+            
+            // Fill items table
+            const itemsBody = document.getElementById('detailItemsBody');
+            itemsBody.innerHTML = '';
+            
+            if (po.items && po.items.length > 0) {
+                let totalPrice = 0;
+                
+                po.items.forEach(item => {
+                    const itemTotal = item.quantity * item.price;
+                    totalPrice += itemTotal;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>Rp ${item.price.toLocaleString('id-ID')}</td>
+                        <td>Rp ${itemTotal.toLocaleString('id-ID')}</td>
+                        <td>${item.description || '-'}</td>
+                    `;
+                    itemsBody.appendChild(row);
+                });
+                
+                document.getElementById('detailTotal').value = `Rp ${totalPrice.toLocaleString('id-ID')}`;
+            }
+            
+            // Set data-id for status buttons
+            document.querySelectorAll('.status-btn').forEach(button => {
+                button.setAttribute('data-id', poId);
+            });
+            
+            // Show modal
+            document.getElementById('poDetailModal').classList.add('active');
+        }
+
+        // Close PO Detail Modal
+        function closePODetailModal() {
+            document.getElementById('poDetailModal').classList.remove('active');
+        }
+
+        // Update PO Status
+        function updatePOStatus(poId, status) {
+            const result = db.updatePOStatus(poId, status);
+            if (result.success) {
+                showAlert(`Status PO berhasil diubah menjadi ${getStatusText(status)}`, 'success');
+                updateDatabaseTable();
+                closePODetailModal();
+            } else {
+                showAlert(result.message, 'danger');
+            }
+        }
+
+        // Initialize application
+        function initApp() {
+            // Initialize database
+            db = new PurchaseOrderDB();
+            
+            // Check if user is logged in
+            const currentUser = db.getCurrentUser();
+            if (currentUser) {
+                showAppPage(currentUser);
+            } else {
+                showLoginPage();
+            }
+            
+            // Setup PO Number - FIXED: Always use proper setup
+            setupPONumber();
+            
+            // Set today's date for PO date (Indonesia time)
+            const today = new Date();
+            const timezoneOffset = today.getTimezoneOffset() * 60000;
+            const localDate = new Date(today - timezoneOffset);
+            const todayString = localDate.toISOString().split('T')[0];
+            
+            // Calculate minimum date (7 days from today)
+            const minDate = new Date(localDate);
+            minDate.setDate(minDate.getDate() + 7);
+            const minDateString = minDate.toISOString().split('T')[0];
+            
+            // Set minimum date to 7 days from today
+            const poDateInput = document.getElementById('poDate');
+            poDateInput.value = minDateString;
+            poDateInput.min = minDateString;
+            
+            // Add first item
+            addItem();
+            
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                const result = db.login(username, password);
+                if (result.success) {
+                    showAlert('Login berhasil!', 'success');
+                    setTimeout(() => {
+                        showAppPage(result.user);
+                        // Setup PO number setelah login
+                        setupPONumber();
+                    }, 1000);
+                } else {
+                    showAlert(result.message, 'danger');
+                }
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                db.logout();
+                showAlert('Anda telah logout', 'info');
+                setTimeout(() => {
+                    showLoginPage();
+                }, 1000);
+            });
+            
+            // Navigation
+            document.getElementById('navInput').addEventListener('click', function(e) {
+                e.preventDefault();
+                showInputSection();
+                // Pastikan PO number tetap sama saat navigasi
+                setupPONumber();
+            });
+            
+            document.getElementById('navDatabase').addEventListener('click', function(e) {
+                e.preventDefault();
+                showDatabaseSection();
+            });
+            
+            // Step navigation buttons
+            document.querySelectorAll('.btn-next').forEach(button => {
+                button.addEventListener('click', function() {
+                    const nextStep = parseInt(this.getAttribute('data-next'));
+                    const currentStep = nextStep - 1;
+                    
+                    let isValid = false;
+                    if (currentStep === 1) isValid = validateStep1();
+                    
+                    if (isValid) {
+                        goToStep(nextStep);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.btn-prev').forEach(button => {
+                button.addEventListener('click', function() {
+                    const prevStep = parseInt(this.getAttribute('data-prev'));
+                    goToStep(prevStep);
+                });
+            });
+            
+            // Add item button
+            document.getElementById('addItemBtn').addEventListener('click', addItem);
+            
+            // PO Form submission - FIXED: Use resetPOForm instead of manual reset
+            document.getElementById('poForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validateStep2()) return;
+                
+                // Collect items data
+                const items = [];
+                document.querySelectorAll('.item-card').forEach(itemCard => {
+                    const name = itemCard.querySelector('.item-name').value;
+                    const quantity = parseInt(itemCard.querySelector('.item-quantity').value);
+                    const price = parseInt(itemCard.querySelector('.item-price').value);
+                    const description = itemCard.querySelector('.item-description').value;
+                    
+                    items.push({
+                        name,
+                        quantity,
+                        price,
+                        description: description || ''
+                    });
+                });
+                
+                const poData = {
+                    poNumber: currentPONumber, // Gunakan currentPONumber yang sudah ditetapkan
+                    poDate: document.getElementById('poDate').value,
+                    department: document.getElementById('department').value,
+                    items: items
+                };
+                
+                const result = db.addPurchaseOrder(poData);
+                if (result.success) {
+                    showAlert('Purchase Order berhasil disimpan!', 'success');
+                    
+                    // Reset form untuk transaksi baru
+                    resetPOForm();
+                    
+                    // Update database table
+                    updateDatabaseTable();
+                } else {
+                    showAlert(result.message, 'danger');
+                }
+            });
+            
+            // Search functionality
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                const query = document.getElementById('searchInput').value;
+                const results = db.searchPurchaseOrders(query);
+                updateDatabaseTable(results);
+                
+                if (results.length === 0 && query) {
+                    showAlert('Tidak ditemukan purchase order dengan kata kunci tersebut', 'info');
+                }
+            });
+            
+            document.getElementById('searchInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('searchBtn').click();
+                }
+            });
+            
+            // Modal functionality
+            document.querySelector('.modal-close').addEventListener('click', closePODetailModal);
+            document.getElementById('closeDetailModal').addEventListener('click', closePODetailModal);
+            
+            // Status buttons
+            document.querySelectorAll('.status-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const poId = parseInt(this.getAttribute('data-id'));
+                    const status = this.getAttribute('data-status');
+                    updatePOStatus(poId, status);
+                });
+            });
+            
+            // Date validation on input change
+            document.getElementById('poDate').addEventListener('change', function() {
+                const today = new Date();
+                const timezoneOffset = today.getTimezoneOffset() * 60000;
+                const localDate = new Date(today - timezoneOffset);
+                const minDate = new Date(localDate);
+                minDate.setDate(minDate.getDate() + 7);
+                const minDateString = minDate.toISOString().split('T')[0];
+                
+                if (this.value < minDateString) {
+                    showAlert('Tanggal PO harus minimal 7 hari ke depan dari hari ini', 'warning');
+                    this.value = minDateString;
+                }
+            });
+            
+            // Handle browser back/forward buttons - FIXED: Prevent PO number change
+            window.addEventListener('popstate', function(event) {
+                // Pastikan PO number tetap sama meskipun user navigasi dengan browser buttons
+                setupPONumber();
+            });
+        }
+
+        function showLoginPage() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appPage').style.display = 'none';
+        }
+
+        function showAppPage(user) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appPage').style.display = 'block';
+            document.getElementById('loggedInUser').textContent = user.name;
+            
+            // Show input section by default
+            showInputSection();
+            
+            // Update database table to show any existing data
+            updateDatabaseTable();
+        }
+
+        function showInputSection() {
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('databaseSection').style.display = 'none';
+            
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.getElementById('navInput').classList.add('active');
+            
+            // Pastikan PO number tetap sama saat navigasi
+            setupPONumber();
+        }
+
+        function showDatabaseSection() {
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('databaseSection').style.display = 'block';
+            
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.getElementById('navDatabase').classList.add('active');
+            
+            // Update table with fresh data
+            updateDatabaseTable();
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
