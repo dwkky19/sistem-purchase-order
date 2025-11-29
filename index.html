@@ -628,6 +628,18 @@
             color: #721c24;
         }
 
+        .status-btn.disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .status-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
         /* Date Info */
         .date-info {
             font-size: 0.85rem;
@@ -724,6 +736,7 @@
                     </div>
                     <div class="user-info">
                         <span id="loggedInUser">Admin</span>
+                        <span id="userRoleBadge" class="status-badge" style="margin-right: 15px; background: #3498db; color: white;">Admin</span>
                         <button id="logoutBtn" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
                     </div>
                 </div>
@@ -943,8 +956,8 @@
             constructor() {
                 this.loadFromStorage();
                 this.users = [
-                    { username: 'admin', password: 'admin123', name: 'Administrator' },
-                    { username: 'user', password: 'user123', name: 'Regular User' }
+                    { username: 'admin', password: 'admin123', name: 'Administrator', role: 'admin' },
+                    { username: 'user', password: 'user123', name: 'Regular User', role: 'user' }
                 ];
                 this.currentUser = null;
             }
@@ -1036,6 +1049,12 @@
             // Purchase Order operations
             addPurchaseOrder(poData) {
                 try {
+                    // Check if PO number already exists - FIXED: Prevent duplicate PO numbers
+                    const existingPO = this.purchaseOrders.find(po => po.poNumber === poData.poNumber);
+                    if (existingPO) {
+                        return { success: false, message: 'Nomor PO sudah digunakan. Silakan refresh halaman untuk mendapatkan nomor PO baru.' };
+                    }
+                    
                     const newPO = {
                         id: Date.now(),
                         poNumber: poData.poNumber,
@@ -1486,6 +1505,20 @@
                 button.setAttribute('data-id', poId);
             });
             
+            // Check user role and disable status buttons if user is not admin
+            const currentUser = db.getCurrentUser();
+            if (currentUser && currentUser.role !== 'admin') {
+                document.querySelectorAll('.status-btn').forEach(button => {
+                    button.classList.add('disabled');
+                    button.disabled = true;
+                });
+            } else {
+                document.querySelectorAll('.status-btn').forEach(button => {
+                    button.classList.remove('disabled');
+                    button.disabled = false;
+                });
+            }
+            
             // Show modal
             document.getElementById('poDetailModal').classList.add('active');
         }
@@ -1497,6 +1530,13 @@
 
         // Update PO Status
         function updatePOStatus(poId, status) {
+            // Check if user is admin
+            const currentUser = db.getCurrentUser();
+            if (currentUser && currentUser.role !== 'admin') {
+                showAlert('Hanya admin yang dapat mengubah status PO', 'danger');
+                return;
+            }
+            
             const result = db.updatePOStatus(poId, status);
             if (result.success) {
                 showAlert(`Status PO berhasil diubah menjadi ${getStatusText(status)}`, 'success');
@@ -1676,6 +1716,11 @@
             // Status buttons
             document.querySelectorAll('.status-btn').forEach(button => {
                 button.addEventListener('click', function() {
+                    if (this.classList.contains('disabled')) {
+                        showAlert('Hanya admin yang dapat mengubah status PO', 'danger');
+                        return;
+                    }
+                    
                     const poId = parseInt(this.getAttribute('data-id'));
                     const status = this.getAttribute('data-status');
                     updatePOStatus(poId, status);
@@ -1713,6 +1758,11 @@
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('appPage').style.display = 'block';
             document.getElementById('loggedInUser').textContent = user.name;
+            
+            // Update user role badge
+            const roleBadge = document.getElementById('userRoleBadge');
+            roleBadge.textContent = user.role === 'admin' ? 'Admin' : 'User';
+            roleBadge.style.background = user.role === 'admin' ? '#3498db' : '#95a5a6';
             
             // Show input section by default
             showInputSection();
