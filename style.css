@@ -487,6 +487,45 @@ tr:hover {
     margin-bottom: 20px;
 }
 
+/* STYLE UNTUK SATUAN HARGA */
+.price-unit-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.price-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.currency-symbol {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    font-weight: 500;
+}
+
+.price-input-wrapper input {
+    padding-left: 35px;
+}
+
+.price-unit-container select {
+    width: 100px;
+}
+
+/* STYLE UNTUK INFORMASI UPDATE */
+.update-info {
+    text-align: center;
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
 /* STYLE UNTUK BADGE STATUS */
 .status-badge {
     display: inline-block;
@@ -659,6 +698,17 @@ tr:hover {
     border-color: var(--danger);
 }
 
+/* STYLE UNTUK TANGGAL DI TABEL */
+small {
+    color: var(--gray);
+    font-size: 0.8rem;
+}
+
+/* STYLE UNTUK TABEL DETAIL */
+#detailItemsTable td {
+    vertical-align: middle;
+}
+
 /* STYLE RESPONSIF UNTUK TABLET DAN MOBILE */
 @media (max-width: 768px) {
     .form-row {
@@ -695,5 +745,14 @@ tr:hover {
         min-width: 250px;
         max-width: 90%;
         padding: 15px 20px;
+    }
+    
+    .price-unit-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .price-unit-container select {
+        width: 100%;
     }
 }

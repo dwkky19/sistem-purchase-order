@@ -10,7 +10,7 @@
         return false;
     });
     
-    // Mencegah akses developer tools (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U)
+    // Mencegah akses developer tools
     document.addEventListener('keydown', function(e) {
         if (
             e.key === 'F12' ||
@@ -136,7 +136,7 @@ class PurchaseOrderDB {
     // Operasi Purchase Order
     addPurchaseOrder(poData) {
         try {
-            // Cek apakah nomor PO sudah ada - Mencegah duplikasi
+            // Cek apakah nomor PO sudah ada
             const existingPO = this.purchaseOrders.find(po => po.poNumber === poData.poNumber);
             if (existingPO) {
                 return { success: false, message: 'Nomor PO sudah digunakan. Silakan refresh halaman untuk mendapatkan nomor PO baru.' };
@@ -150,15 +150,14 @@ class PurchaseOrderDB {
                 items: poData.items,
                 status: 'draft',
                 createdBy: this.getCurrentUser().name,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                updatedAt: poData.updatedAt || new Date().toISOString()
             };
             
-            // Pastikan purchaseOrders adalah array
             if (!Array.isArray(this.purchaseOrders)) {
                 this.purchaseOrders = [];
             }
             
-            // Tambahkan PO baru
             this.purchaseOrders.push(newPO);
             
             // Simpan ke localStorage
@@ -172,11 +171,17 @@ class PurchaseOrderDB {
         }
     }
     
-    // Mendapatkan semua data Purchase Order
+    // Mendapatkan semua data Purchase Order dengan sorting terbaru
     getAllPurchaseOrders() {
-        // Selalu ambil data terbaru dari localStorage
         this.loadFromStorage();
-        return this.purchaseOrders || [];
+        const purchaseOrders = this.purchaseOrders || [];
+        
+        // Sort berdasarkan updatedAt terbaru
+        return purchaseOrders.sort((a, b) => {
+            const dateA = new Date(a.updatedAt || a.createdAt);
+            const dateB = new Date(b.updatedAt || b.createdAt);
+            return dateB - dateA; // Descending (terbaru dulu)
+        });
     }
     
     // Pencarian Purchase Order
@@ -206,6 +211,7 @@ class PurchaseOrderDB {
         const poIndex = this.purchaseOrders.findIndex(po => po.id === id);
         if (poIndex !== -1) {
             this.purchaseOrders[poIndex].status = status;
+            this.purchaseOrders[poIndex].updatedAt = new Date().toISOString();
             this.saveToStorage();
             return { success: true, data: this.purchaseOrders[poIndex] };
         }
@@ -352,6 +358,7 @@ function validateStep2() {
         const name = item.querySelector('.item-name').value;
         const quantity = item.querySelector('.item-quantity').value;
         const price = item.querySelector('.item-price').value;
+        const unit = item.querySelector('.item-unit').value;
         const description = item.querySelector('.item-description').value;
         
         if (!name) {
@@ -366,9 +373,15 @@ function validateStep2() {
             return false;
         }
         
-        if (!price || price < 1000) {
-            showAlert(`Harga barang ke-${i+1} harus minimal Rp 1.000`, 'warning');
+        if (!price || price < 1) {
+            showAlert(`barang ke-${i+1} harus minimal 1`, 'warning');
             item.querySelector('.item-price').focus();
+            return false;
+        }
+        
+        if (!unit) {
+            showAlert(`Satuan barang ke-${i+1} harus dipilih`, 'warning');
+            item.querySelector('.item-unit').focus();
             return false;
         }
         
@@ -426,7 +439,7 @@ function goToStep(stepNumber) {
 // FUNGSI MANAJEMEN ITEM BARANG
 // =============================================
 
-// Menambah item barang
+// Menambah item barang dengan satuan
 function addItem() {
     const itemList = document.getElementById('itemList');
     const itemCount = itemList.children.length + 1;
@@ -451,8 +464,25 @@ function addItem() {
                     <input type="number" class="form-control item-quantity" required min="1" max="10000" placeholder="Masukkan jumlah">
                 </div>
                 <div class="form-group">
-                    <label>Harga Satuan (Rp)</label>
-                    <input type="number" class="form-control item-price" required min="1000" step="1000" placeholder="Masukkan harga satuan">
+                    <label>Satuan</label>
+                    <div class="price-unit-container">
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">Rp</span>
+                            <input type="number" class="form-control item-price" required min="1000" step="1000" placeholder="Masukkan harga">
+                        </div>
+                        <select class="form-control item-unit">
+                            <option value="PCS">PCS</option>
+                            <option value="BOX">BOX</option>
+                            <option value="PACK">PACK</option>
+                            <option value="RIM">RIM</option>
+                            <option value="ROLL">ROLL</option>
+                            <option value="LSN">LSN</option>
+                            <option value="UNIT">UNIT</option>
+                            <option value="SET">SET</option>
+                            <option value="MTR">MTR</option>
+                            <option value="KG">KG</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
@@ -538,15 +568,25 @@ function updateDatabaseTable(poList = null) {
         const statusClass = `status-${po.status}`;
         const statusText = getStatusText(po.status);
         
+        // Format tanggal update
+        const updateDate = new Date(po.updatedAt || po.createdAt);
+        const displayDate = updateDate.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
         return `
             <tr>
-                <td>${po.poNumber}</td>
+                <td><strong>${po.poNumber}</strong></td>
                 <td>${new Date(po.poDate).toLocaleDateString('id-ID')}</td>
                 <td>${po.department}</td>
                 <td>${totalItems} item</td>
                 <td>Rp ${totalPrice.toLocaleString('id-ID')}</td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                <td>${po.createdBy}</td>
+                <td>${po.createdBy}<br><small>${displayDate}</small></td>
                 <td>
                     <button class="btn" data-action="view" data-id="${po.id}">
                         <i class="fas fa-eye"></i> Lihat
@@ -612,8 +652,8 @@ function showPODetail(poId) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${item.name}</td>
-                <td>${item.quantity}</td>
-                <td>Rp ${item.price.toLocaleString('id-ID')}</td>
+                <td>${item.quantity} ${item.unit || ''}</td>
+                <td>Rp ${item.price.toLocaleString('id-ID')} / ${item.unit || 'Unit'}</td>
                 <td>Rp ${itemTotal.toLocaleString('id-ID')}</td>
                 <td>${item.description || '-'}</td>
             `;
@@ -651,6 +691,25 @@ function showPODetail(poId) {
         }
     }
     
+    // Tampilkan informasi waktu update
+    const updateDate = new Date(po.updatedAt || po.createdAt);
+    const displayDate = updateDate.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    // Tambahkan informasi update time ke modal
+    let updateInfo = document.querySelector('.update-info');
+    if (!updateInfo) {
+        updateInfo = document.createElement('div');
+        updateInfo.className = 'update-info';
+        document.querySelector('.modal-body').appendChild(updateInfo);
+    }
+    updateInfo.innerHTML = `<small><i class="fas fa-clock"></i> Terakhir update: ${displayDate}</small>`;
+    
     // Tampilkan modal
     document.getElementById('poDetailModal').classList.add('active');
 }
@@ -663,7 +722,6 @@ function closePODetailModal() {
 // Update status PO
 function updatePOStatus(poId, status) {
     // Cek permissions user berdasarkan role
-    
     const currentUser = db.getCurrentUser();
     
     // User biasa hanya bisa melakukan Release
@@ -803,21 +861,24 @@ function initApp() {
             const name = itemCard.querySelector('.item-name').value;
             const quantity = parseInt(itemCard.querySelector('.item-quantity').value);
             const price = parseInt(itemCard.querySelector('.item-price').value);
+            const unit = itemCard.querySelector('.item-unit').value;
             const description = itemCard.querySelector('.item-description').value;
             
             items.push({
                 name,
                 quantity,
                 price,
+                unit,
                 description: description || ''
             });
         });
         
         const poData = {
-            poNumber: currentPONumber, // Gunakan currentPONumber yang sudah ditetapkan
+            poNumber: currentPONumber,
             poDate: document.getElementById('poDate').value,
             department: document.getElementById('department').value,
-            items: items
+            items: items,
+            updatedAt: new Date().toISOString()
         };
         
         const result = db.addPurchaseOrder(poData);
@@ -889,7 +950,7 @@ function initApp() {
         }
     });
     
-    // Handle browser back/forward buttons - Mencegah perubahan nomor PO
+    // Handle browser back/forward buttons
     window.addEventListener('popstate', function(event) {
         // Pastikan PO number tetap sama meskipun user navigasi dengan browser buttons
         setupPONumber();
